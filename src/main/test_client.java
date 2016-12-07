@@ -107,8 +107,8 @@ class Client {
 			}
 			
 			System.out.println("Shared Secret: " + sb.toString());
-			//BigInteger sharedSecret = new BigInteger(sb.toString(),16);
-			BigInteger sharedSecret = new BigInteger(byteData).mod(p); 
+			BigInteger sharedSecret = new BigInteger(sb.toString(),16);
+			//BigInteger sharedSecret = new BigInteger(byteData).mod(p); 
 			
 			//SOCIALIST MILLIONAIRE
 			
