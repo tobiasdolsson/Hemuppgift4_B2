@@ -36,6 +36,21 @@ class Client {
 	public String toHex(String arg) {
 	    return String.format("%040x", new BigInteger(1, arg.getBytes(Charset.forName("UTF-8"))));
 	}
+	
+	public byte[] removeZeros(byte[] a){
+		
+		if(a[0]==0){
+			byte[] b = new byte[a.length-1];
+			for(int i =0; i<b.length; i++){
+				b[i] = a[i+1];
+			}
+			return b;
+		} else{
+			return a;
+		}
+		
+		
+	}
 
 	void run() {
 		String serverName = "eitn41.eit.lth.se";
@@ -75,15 +90,13 @@ class Client {
 			
 			//Shared secret:
 			byte keys[] = key.toByteArray();
+			//System.out.println("key array"+Arrays.toString(keys));
+			keys = removeZeros(keys);
 			//byte keys[] = toByteArray2(key.toString(16));
 			System.out.println("key array"+Arrays.toString(keys));
 			String s = "eitn41 <3";
-			String s2 = toHex(s);
-			//Orkar inte ta bort nollorna
-			s2 = "6569746e3431203c33";
-			
-			
-			byte keys2[] = s2.getBytes();
+					
+			byte keys2[] = s.getBytes("UTF-8");
 			System.out.println("shared secret array"+Arrays.toString(keys2));
 			byte finalkeys[] = concatenate(keys, keys2);
 			System.out.println("conc array"+Arrays.toString(finalkeys));
@@ -102,13 +115,13 @@ class Client {
 			//byte byteData[] = finalkeys;
 			System.out.println("after sha"+Arrays.toString(byteData));
 			StringBuffer sb = new StringBuffer();
-			for (int i = 0; i < byteData.length; i++) {
-				sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
-			}
+			//for (int i = 0; i < byteData.length; i++) {
+			//	sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+		//	}
 			
-			System.out.println("Shared Secret: " + sb.toString());
-			BigInteger sharedSecret = new BigInteger(sb.toString(),16);
-			//BigInteger sharedSecret = new BigInteger(byteData).mod(p); 
+			//System.out.println("Shared Secret: " + sb.toString());
+			//BigInteger sharedSecret = new BigInteger(sb.toString(),16);
+			BigInteger sharedSecret = new BigInteger(byteData); 
 			
 			//SOCIALIST MILLIONAIRE
 			
@@ -144,9 +157,9 @@ class Client {
 			System.out.println("\nPa received: "+Pa);
 			
 			//Skicka Pb
-			BigInteger Pb = new BigInteger("13");
-			BigInteger g_Pb = g3.modPow(Pb, p);
-			out.println(g_Pb.toString(16));
+			BigInteger b = new BigInteger("13");
+			BigInteger g3_Pb = g3.modPow(b, p);
+			out.println(g3_Pb.toString(16));
 			System.out.println("\nsent Pb: - " + in.readLine());
 			
 			//Ta emot Qa
@@ -155,8 +168,8 @@ class Client {
 			BigInteger Qaa = new BigInteger(Qa,16);
 			
 			//Skicka Qb
-			BigInteger Qb = new BigInteger("5");
-			BigInteger g_Qb = g.modPow(Qb,p).multiply(g2.modPow(sharedSecret, p));
+			//BigInteger Qb = new BigInteger("13");
+			BigInteger g_Qb = g.modPow(b,p).multiply(g2.modPow(sharedSecret, p));
 			out.println(g_Qb.toString(16));
 			System.out.println("\nsent Qb: - " + in.readLine());
 			
@@ -175,8 +188,10 @@ class Client {
 			System.out.println("\nauth received: "+auth);
 			
 			//Skicka meddelande
-			BigInteger test = new BigInteger("539",16);
 			
+			
+			BigInteger test = new BigInteger("0123456789abcdef",16);
+			test = test.xor(key);
 			out.println(test);
 			
 			String response = in.readLine();
